@@ -1,4 +1,4 @@
-# NORDNET v0.9.1 — Full LOCAL Implementation Bundle (Named Projects)
+# NORDNET v0.9.1 - Full LOCAL Implementation
 
 **Status:** One-command *orchestrator* built and tested offline. **Fresh Phase 1→v0.8 end-to-end GNS3 deployment has NOT been exercised on a live controller**; do not claim production-ready provisioning. The separate phases have been used successfully across the NORDNET project, but their end-to-end combination still needs a trial on an isolated controller.
 
