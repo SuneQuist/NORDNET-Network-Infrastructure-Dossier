@@ -1,0 +1,29 @@
+! Phase 5: single-site {{ customer.vrf }} customer CE, no default route
+hostname {{ customer.ce }}
+no ip domain-lookup
+ip cef
+!
+interface {{ customer.ce_interface }}
+ description TRANSIT_TO_{{ customer.pe }}
+ ip address {{ customer.ce_ip }} {{ customer.mask }}
+ no shutdown
+ exit
+!
+interface Loopback10
+ description SYNTHETIC_{{ customer.vrf }}_LAN_PHASE5
+ ip address {{ customer.lan_ip }} 255.255.255.0
+ exit
+!
+ip prefix-list PL-{{ customer.vrf }}-CE-OUT seq 5 permit {{ customer.lan_prefix }}
+!
+! No customer routes should be imported in phase 5.
+ip prefix-list PL-{{ customer.vrf }}-CE-IN seq 5 deny 0.0.0.0/0 le 32
+!
+router bgp {{ customer.ce_asn }}
+ bgp router-id {{ customer.lan_ip }}
+ bgp log-neighbor-changes
+ neighbor {{ customer.pe_ip }} remote-as {{ provider_asn }}
+ neighbor {{ customer.pe_ip }} prefix-list PL-{{ customer.vrf }}-CE-OUT out
+ neighbor {{ customer.pe_ip }} prefix-list PL-{{ customer.vrf }}-CE-IN in
+ network {{ customer.lan_prefix.split('/')[0] }} mask 255.255.255.0
+ exit

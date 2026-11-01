@@ -1,0 +1,28 @@
+hostname {{ name }}
+no ip domain-lookup
+ip cef
+interface Loopback0
+ description CORE_ROUTER_ID
+ ip address {{ router.loopback }} 255.255.255.255
+ ip ospf {{ ospf_process }} area {{ ospf_area }}
+ exit
+{% for interface in router.interfaces %}
+interface {{ interface.name }}
+ description {{ interface.description }}
+ ip address {{ interface.ip }} {{ interface.mask }}
+ ip ospf {{ ospf_process }} area {{ ospf_area }}
+ ip ospf network point-to-point
+ ip ospf cost {{ interface.ospf_cost }}
+ mpls ip
+ no shutdown
+ exit
+{% endfor %}
+router ospf {{ ospf_process }}
+ router-id {{ router.loopback }}
+ passive-interface default
+{% for interface in router.interfaces %}
+ no passive-interface {{ interface.name }}
+{% endfor %}
+ exit
+mpls label protocol ldp
+mpls ldp router-id Loopback0 force

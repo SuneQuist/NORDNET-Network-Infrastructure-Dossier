@@ -1,0 +1,36 @@
+# NORDNET Phase 4 — builds on the Phase 3 lab; does not re-create core or CEs.
+project: NORDNET-Core-POC
+compute: vm
+template_name: 'Cisco IOSv 15.9(3)M8' # GNS3 display name; image actually boots IOSv 15.9(3)M3
+ospf_process: 100
+ospf_area: 0
+p1_cost: 10
+p2_cost: 30
+routers:
+  PE1:
+    loopback: 172.20.255.1
+    backup_interface: GigabitEthernet0/2
+    backup_address: 172.20.0.9
+  PE2:
+    loopback: 172.20.255.2
+    backup_interface: GigabitEthernet0/2
+    backup_address: 172.20.0.14
+  P2:
+    loopback: 172.20.255.4
+    interfaces:
+      - name: GigabitEthernet0/0
+        description: CORE_TO_PE1
+        ip: 172.20.0.10
+        peer: PE1
+      - name: GigabitEthernet0/1
+        description: CORE_TO_PE2
+        ip: 172.20.0.13
+        peer: PE2
+links_existing:
+  - [PE1, GigabitEthernet0/0, P1, GigabitEthernet0/0]
+  - [P1, GigabitEthernet0/1, PE2, GigabitEthernet0/0]
+  - [PE1, GigabitEthernet0/1, CE-MUNI-HQ, GigabitEthernet0/0]
+  - [PE2, GigabitEthernet0/1, CE-MUNI-BR, GigabitEthernet0/0]
+links_new:
+  - [PE1, GigabitEthernet0/2, P2, GigabitEthernet0/0]
+  - [P2, GigabitEthernet0/1, PE2, GigabitEthernet0/2]

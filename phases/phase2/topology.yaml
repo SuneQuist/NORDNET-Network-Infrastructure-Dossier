@@ -1,0 +1,33 @@
+project: NORDNET-Core-POC
+ospf_process: 100
+ospf_area: 0
+routers:
+  PE1:
+    loopback: 172.20.255.1
+    interfaces:
+      - name: GigabitEthernet0/0
+        description: CORE_TO_P1
+        ip: 172.20.0.1
+        mask: 255.255.255.252
+        ospf_cost: 10
+  P1:
+    loopback: 172.20.255.3
+    interfaces:
+      - name: GigabitEthernet0/0
+        description: CORE_TO_PE1
+        ip: 172.20.0.2
+        mask: 255.255.255.252
+        ospf_cost: 10
+      - name: GigabitEthernet0/1
+        description: CORE_TO_PE2
+        ip: 172.20.0.5
+        mask: 255.255.255.252
+        ospf_cost: 10
+  PE2:
+    loopback: 172.20.255.2
+    interfaces:
+      - name: GigabitEthernet0/0
+        description: CORE_TO_P1
+        ip: 172.20.0.6
+        mask: 255.255.255.252
+        ospf_cost: 10

@@ -1,0 +1,47 @@
+# Phase 5 extends the *verified* six-router NORDNET Phase 4 project.
+project: NORDNET-Core-POC
+compute: vm
+template_name: 'Cisco IOSv 15.9(3)M8' # GNS3 template display name, image boots IOSv 15.9(3)M3
+provider_asn: 65000
+customers:
+  UNIV:
+    pe: PE1
+    ce: CE-UNIV
+    pe_interface: GigabitEthernet0/3
+    ce_interface: GigabitEthernet0/0
+    pe_ip: 172.21.0.9
+    ce_ip: 172.21.0.10
+    mask: 255.255.255.252
+    ce_asn: 65210
+    vrf: UNIV
+    rd: '65000:2001'
+    rt: '65000:200'
+    lan_prefix: 10.20.10.0/24
+    lan_ip: 10.20.10.1
+    node_x: -550
+    node_y: -140
+  HEALTH:
+    pe: PE2
+    ce: CE-HEALTH
+    pe_interface: GigabitEthernet0/3
+    ce_interface: GigabitEthernet0/0
+    pe_ip: 172.21.0.13
+    ce_ip: 172.21.0.14
+    mask: 255.255.255.252
+    ce_asn: 65310
+    vrf: HEALTH
+    rd: '65000:3002'
+    rt: '65000:300'
+    lan_prefix: 10.30.10.0/24
+    lan_ip: 10.30.10.1
+    node_x: 550
+    node_y: -140
+
+# Immutable expected Phase 4 physical links, verified before making changes.
+links_existing:
+  - [PE1, GigabitEthernet0/0, P1, GigabitEthernet0/0]
+  - [P1, GigabitEthernet0/1, PE2, GigabitEthernet0/0]
+  - [PE1, GigabitEthernet0/1, CE-MUNI-HQ, GigabitEthernet0/0]
+  - [PE2, GigabitEthernet0/1, CE-MUNI-BR, GigabitEthernet0/0]
+  - [PE1, GigabitEthernet0/2, P2, GigabitEthernet0/0]
+  - [P2, GigabitEthernet0/1, PE2, GigabitEthernet0/2]

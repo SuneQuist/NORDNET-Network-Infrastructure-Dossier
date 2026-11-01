@@ -1,0 +1,27 @@
+! Simulated municipal site LAN via Loopback10 for Phase 3 only
+hostname {{ name }}
+no ip domain-lookup
+ip cef
+!
+interface {{ router.customer_interface }}
+ description PROVIDER_EDGE
+ ip address {{ router.customer_ip }} 255.255.255.252
+ no shutdown
+ exit
+!
+interface Loopback10
+ description SIMULATED_MUNICIPAL_LAN_PHASE3
+ ip address {{ router.loopback }} 255.255.255.0
+ exit
+!
+ip prefix-list {{ router.out_filter }} seq 5 permit {{ router.lan_prefix }}
+ip prefix-list {{ router.in_filter }} seq 5 permit {{ router.remote_lan_prefix }}
+!
+router bgp {{ router.asn }}
+ bgp router-id {{ router.loopback }}
+ bgp log-neighbor-changes
+ neighbor {{ router.customer_peer_ip }} remote-as {{ router.peer_asn }}
+ neighbor {{ router.customer_peer_ip }} prefix-list {{ router.out_filter }} out
+ neighbor {{ router.customer_peer_ip }} prefix-list {{ router.in_filter }} in
+ network {{ router.lan_prefix.split('/')[0] }} mask 255.255.255.0
+ exit

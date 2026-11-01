@@ -1,0 +1,6 @@
+project: NORDNET-Core-POC
+docker_image: python:3.12-alpine
+service_ip: 10.10.30.250
+service_node: SVC-NORDNET-LOCAL
+# Architecture: municipal VLAN30, private university CE /30, private healthcare CE /30.
+# NO route-target import/export changes; NO external service exposure.

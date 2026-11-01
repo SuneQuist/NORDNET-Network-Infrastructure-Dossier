@@ -1,0 +1,32 @@
+! PE customer VPN addition: does NOT alter the verified OSPF/LDP core
+ip vrf {{ vrf }}
+ rd {{ router.rd }}
+ route-target export {{ route_target }}
+ route-target import {{ route_target }}
+ exit
+!
+ip prefix-list {{ router.filter }} seq 5 permit {{ router.allowed_prefix }}
+!
+interface {{ router.customer_interface }}
+ description CE_{{ name | replace('-', '_') }}_CUSTOMER
+ ip vrf forwarding {{ vrf }}
+ ip address {{ router.customer_ip }} 255.255.255.252
+ no shutdown
+ exit
+!
+router bgp {{ provider_asn }}
+ bgp router-id {{ router.router_id }}
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor {{ router.peer_loopback }} remote-as {{ provider_asn }}
+ neighbor {{ router.peer_loopback }} update-source Loopback0
+ address-family vpnv4
+  neighbor {{ router.peer_loopback }} activate
+  neighbor {{ router.peer_loopback }} send-community extended
+  exit-address-family
+ address-family ipv4 vrf {{ vrf }}
+  neighbor {{ router.customer_peer_ip }} remote-as {{ router.customer_asn }}
+  neighbor {{ router.customer_peer_ip }} activate
+  neighbor {{ router.customer_peer_ip }} prefix-list {{ router.filter }} in
+  exit-address-family
+ exit

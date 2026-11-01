@@ -1,0 +1,23 @@
+! Phase 5: Add isolated {{ customer.vrf }} VPN to {{ customer.pe }}; do not edit core or MUNI
+ip vrf {{ customer.vrf }}
+ rd {{ customer.rd }}
+ route-target export {{ customer.rt }}
+ route-target import {{ customer.rt }}
+ exit
+!
+ip prefix-list PL-{{ customer.vrf }}-CE-IN seq 5 permit {{ customer.lan_prefix }}
+!
+interface {{ customer.pe_interface }}
+ description CUSTOMER_{{ customer.vrf }}_{{ customer.ce }}
+ ip vrf forwarding {{ customer.vrf }}
+ ip address {{ customer.pe_ip }} {{ customer.mask }}
+ no shutdown
+ exit
+!
+router bgp {{ provider_asn }}
+ address-family ipv4 vrf {{ customer.vrf }}
+  neighbor {{ customer.ce_ip }} remote-as {{ customer.ce_asn }}
+  neighbor {{ customer.ce_ip }} activate
+  neighbor {{ customer.ce_ip }} prefix-list PL-{{ customer.vrf }}-CE-IN in
+  exit-address-family
+ exit

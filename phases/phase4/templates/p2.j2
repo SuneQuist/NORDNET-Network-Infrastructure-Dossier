@@ -1,0 +1,29 @@
+! Phase 4: new P2 provider router; OSPF/MPLS only
+hostname P2
+no ip domain-lookup
+ip cef
+interface Loopback0
+ description PROVIDER_P2_LDP_ROUTER_ID
+ ip address {{ p2.loopback }} 255.255.255.255
+ ip ospf {{ ospf_process }} area {{ ospf_area }}
+ exit
+{% for iface in p2.interfaces %}
+interface {{ iface.name }}
+ description {{ iface.description }}
+ ip address {{ iface.ip }} 255.255.255.252
+ ip ospf {{ ospf_process }} area {{ ospf_area }}
+ ip ospf network point-to-point
+ ip ospf cost {{ p2_cost }}
+ mpls ip
+ no shutdown
+ exit
+{% endfor %}
+router ospf {{ ospf_process }}
+ router-id {{ p2.loopback }}
+ passive-interface default
+{% for iface in p2.interfaces %}
+ no passive-interface {{ iface.name }}
+{% endfor %}
+ exit
+mpls label protocol ldp
+mpls ldp router-id Loopback0 force

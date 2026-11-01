@@ -1,0 +1,35 @@
+hostname {{ switch }}
+no ip domain-lookup
+vtp mode transparent
+!
+{% for n in networks %}
+vlan {{ n.vlan }}
+ name {{ n.name }}
+ exit
+!
+{% endfor %}
+interface {{ trunk_interface }}
+ description TRUNK_TO_{{ ce }}
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan {{ networks | map(attribute='vlan') | join(',') }}
+ no shutdown
+ exit
+!
+{% for ep in endpoints %}
+interface {{ ep.port }}
+ description {{ ep.name }}
+ switchport mode access
+ switchport access vlan {{ ep.vlan }}
+ spanning-tree portfast
+ no shutdown
+ exit
+!
+{% endfor %}
+interface Vlan99
+ ip address {{ mgmt_ip }} 255.255.255.0
+ no shutdown
+ exit
+ip default-gateway {{ mgmt_gateway }}
+service timestamps log datetime msec
+logging buffered 32768 informational

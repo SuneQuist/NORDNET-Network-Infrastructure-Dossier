@@ -1,0 +1,42 @@
+! LOCAL ENTERPRISE: {{ site }} customer edge; migrating Loopback10 onto routed VLAN 10
+! This temporarily interrupts the original loopback-based LAN until VLAN 10 is up.
+no interface Loopback10
+!
+interface {{ trunk_interface }}
+ description DOT1Q_TO_{{ switch }}
+ no ip address
+ no shutdown
+ exit
+!
+{% for n in networks %}
+interface {{ trunk_interface }}.{{ n.vlan }}
+ description VLAN{{ n.vlan }}_{{ n.name }}
+ encapsulation dot1Q {{ n.vlan }}
+ ip address {{ n.gateway }} 255.255.255.0
+{% if site == 'HQ' and n.vlan == 10 %}
+ ip access-group NORD-HQ-STAFF-IN in
+{% endif %}
+ exit
+!
+{% endfor %}
+{% if site == 'HQ' %}
+ip access-list extended NORD-HQ-STAFF-IN
+ deny ip 10.10.10.0 0.0.0.255 10.10.20.0 0.0.0.255 log
+ permit ip any any
+ exit
+!
+{% endif %}
+{% for n in networks if n.bgp %}
+ip prefix-list PL-CE-{{ site }}-OUT seq {{ 5 + loop.index0 * 5 }} permit {{ n.subnet }}
+{% endfor %}
+{% for prefix in remote_prefixes %}
+ip prefix-list PL-CE-{{ site }}-IN seq {{ 5 + loop.index0 * 5 }} permit {{ prefix }}
+{% endfor %}
+router bgp {{ asn }}
+{% for n in networks if n.bgp %}
+ network {{ n.subnet.split('/')[0] }} mask 255.255.255.0
+{% endfor %}
+ exit
+!
+service timestamps log datetime msec
+logging buffered 32768 informational

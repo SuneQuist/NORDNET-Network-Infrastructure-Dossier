@@ -1,0 +1,60 @@
+project: NORDNET-Core-POC
+compute: vm
+template_name: Cisco IOSv 15.9(3)M8
+provider_asn: 65000
+vrf: MUNI
+route_target: '65000:100'
+routers:
+  PE1:
+    role: pe
+    asn: 65000
+    router_id: 172.20.255.1
+    peer_loopback: 172.20.255.2
+    rd: '65000:1001'
+    customer_interface: GigabitEthernet0/1
+    customer_ip: 172.21.0.1
+    customer_peer_ip: 172.21.0.2
+    customer_asn: 65110
+    allowed_prefix: 10.10.10.0/24
+    filter: PL-MUNI-HQ
+  PE2:
+    role: pe
+    asn: 65000
+    router_id: 172.20.255.2
+    peer_loopback: 172.20.255.1
+    rd: '65000:1002'
+    customer_interface: GigabitEthernet0/1
+    customer_ip: 172.21.0.5
+    customer_peer_ip: 172.21.0.6
+    customer_asn: 65111
+    allowed_prefix: 10.11.10.0/24
+    filter: PL-MUNI-BR
+  CE-MUNI-HQ:
+    role: ce
+    asn: 65110
+    peer_asn: 65000
+    customer_interface: GigabitEthernet0/0
+    customer_ip: 172.21.0.2
+    customer_peer_ip: 172.21.0.1
+    loopback: 10.10.10.1
+    lan_prefix: 10.10.10.0/24
+    remote_lan_prefix: 10.11.10.0/24
+    out_filter: PL-CE-HQ-OUT
+    in_filter: PL-CE-HQ-IN
+  CE-MUNI-BR:
+    role: ce
+    asn: 65111
+    peer_asn: 65000
+    customer_interface: GigabitEthernet0/0
+    customer_ip: 172.21.0.6
+    customer_peer_ip: 172.21.0.5
+    loopback: 10.11.10.1
+    lan_prefix: 10.11.10.0/24
+    remote_lan_prefix: 10.10.10.0/24
+    out_filter: PL-CE-BR-OUT
+    in_filter: PL-CE-BR-IN
+links:
+  - [PE1, GigabitEthernet0/0, P1, GigabitEthernet0/0]
+  - [P1, GigabitEthernet0/1, PE2, GigabitEthernet0/0]
+  - [PE1, GigabitEthernet0/1, CE-MUNI-HQ, GigabitEthernet0/0]
+  - [PE2, GigabitEthernet0/1, CE-MUNI-BR, GigabitEthernet0/0]
