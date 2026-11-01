@@ -143,4 +143,6 @@ This release consolidates the previously developed NORDNET code. Its new orchest
 ## v0.9.1 project-name change
 
 The `--name` parameter is supported on `plan`, `preflight`, `deploy`, `validate` and `recover-dhcp`. For a fresh build the preflight inspects **only the requested name**. Phase 1 creates that GNS3 project and the remaining phases select it by name; no existing `NORDNET-Core-POC` project is needed. Existing named projects are never overwritten by fresh mode. The selected project name is kept in a scoped process environment variable while the legacy phase scripts run and is restored after the operation. The addressing inside the network is unchanged. The full named-project workflow has unit and mock-controller tests, but its complete live deployment remains untested.
-# NORDNET---Network-Infrastructure-Dossier
+# NORDNET-Network-Infrastructure-Dossier
+<img width="1052" height="655" alt="image" src="https://github.com/user-attachments/assets/8e9a24cb-a335-426e-98a2-a47e2de7128c" />
+<img width="318" height="365" alt="image" src="https://github.com/user-attachments/assets/77d8f092-5fb2-4b67-b403-8cd681e56fc7" />
